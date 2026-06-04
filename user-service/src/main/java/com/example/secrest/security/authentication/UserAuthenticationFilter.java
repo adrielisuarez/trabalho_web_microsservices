@@ -18,7 +18,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.Arrays;
 
 @Component
 public class UserAuthenticationFilter extends OncePerRequestFilter {
@@ -96,7 +95,13 @@ public class UserAuthenticationFilter extends OncePerRequestFilter {
         String uri = request.getRequestURI();
         String method = request.getMethod();
 
-        return ("/users".equals(uri) && "POST".equalsIgnoreCase(method))
-                || ("/users/login".equals(uri) && "POST".equalsIgnoreCase(method));
+        return ("/users".equals(uri)
+                    && "POST".equalsIgnoreCase(method))
+                || ("/users/login".equals(uri)
+                    && "POST".equalsIgnoreCase(method))
+                || ("/auth/request-code".equals(uri)
+                    && "POST".equalsIgnoreCase(method))
+                || ("/auth/verify-code".equals(uri)
+                    && "POST".equalsIgnoreCase(method));
     }
 }

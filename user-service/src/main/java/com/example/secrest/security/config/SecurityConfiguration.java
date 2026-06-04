@@ -50,11 +50,11 @@ public class SecurityConfiguration {
 
 
                        .authorizeHttpRequests(authorize -> authorize
-                           .requestMatchers(HttpMethod.POST, "/users").permitAll()
-                           .requestMatchers(HttpMethod.POST, "/users/login").permitAll()
-                           .anyRequest()
-                           .authenticated())
-
+                                .requestMatchers(HttpMethod.POST, "/users").permitAll()
+                                .requestMatchers(HttpMethod.POST, "/users/login").permitAll()
+                                .requestMatchers(HttpMethod.POST, "/auth/request-code").permitAll()
+                                .requestMatchers(HttpMethod.POST, "/auth/verify-code").permitAll()
+                                .anyRequest().authenticated())
                 .addFilterBefore(
                         userAuthenticationFilter,
                         UsernamePasswordAuthenticationFilter.class)
