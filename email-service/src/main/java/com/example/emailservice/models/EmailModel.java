@@ -23,6 +23,7 @@ public class EmailModel {
     private StatusEmail status;
 }
 
-enum StatusEmail {
+
+public enum StatusEmail {
     SENT, ERROR
 }

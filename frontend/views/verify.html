@@ -5,30 +5,38 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Validar Código</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 40px; }
-        form { display: flex; flex-direction: column; max-width: 300px; gap: 10px; }
-        input, button { padding: 8px; font-size: 16px; }
-        button { cursor: pointer; background-color: #28a745; color: white; border: none; }
+        body { font-family: Arial, sans-serif; margin: 40px; background: #f5f5f5; }
+        .container { max-width: 360px; background: white; padding: 32px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        h2 { margin-top: 0; color: #333; }
+        form { display: flex; flex-direction: column; gap: 12px; }
+        label { font-size: 14px; color: #555; }
+        input[type="text"] { padding: 10px; font-size: 20px; letter-spacing: 6px; text-align: center; border: 1px solid #ccc; border-radius: 4px; }
+        button { padding: 10px; font-size: 15px; cursor: pointer; background-color: #28a745; color: white; border: none; border-radius: 4px; }
+        button:hover { background-color: #1e7e34; }
+        .email-info { font-size: 13px; color: #777; margin-bottom: 4px; }
     </style>
 </head>
 <body>
-    <h2>Insira o Código Recebido</h2>
-    <p>Verifique sua caixa de entrada no e-mail.</p>
+    <div class="container">
+        <h2>Insira o Código Recebido</h2>
+        <p class="email-info">Verifique sua caixa de entrada no e-mail: <strong id="emailDisplay"></strong></p>
 
-    <form action="/verify-code" method="POST">
-        <!-- Campo oculto para repassar o e-mail para a rota POST -->
-        <input type="hidden" id="email" name="email">
-        
-        <label for="code">Código de 6 dígitos:</label>
-        <input type="text" id="code" name="code" required placeholder="Ex: 123456" maxlength="6">
-        
-        <button type="submit">Validar Acesso</button>
-    </form>
-    
+        <form action="/verify-code" method="POST">
+            <!-- Campo oculto para repassar o e-mail -->
+            <input type="hidden" id="email" name="email">
+
+            <label for="code">Código de 6 dígitos:</label>
+            <input type="text" id="code" name="code" required placeholder="000000" maxlength="6" pattern="\d{6}">
+
+            <button type="submit">Validar Acesso</button>
+        </form>
+    </div>
+
     <script>
-        // Puxa o e-mail da query string (ex: ?email=seuemail@gmail.com) e preenche o campo oculto
         const urlParams = new URLSearchParams(window.location.search);
-        document.getElementById('email').value = urlParams.get('email');
+        const email = urlParams.get('email');
+        document.getElementById('email').value = email;
+        document.getElementById('emailDisplay').textContent = email;
     </script>
 </body>
 </html>
