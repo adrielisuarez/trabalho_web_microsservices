@@ -1,9 +1,8 @@
-package com.example.emailservice.repository;
+package com.example.emailservice.repositories;
 
-import com.example.emailservice.entity.EmailMessage;
+import com.example.emailservice.models.EmailModel;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+import java.util.UUID;
 
-@Repository
-public interface EmailRepository extends JpaRepository<EmailMessage, Long> {
+public interface EmailRepository extends JpaRepository<EmailModel, UUID> {
 }

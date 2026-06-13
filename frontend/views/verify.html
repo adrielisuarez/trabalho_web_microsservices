@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Validar Código</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        form { display: flex; flex-direction: column; max-width: 300px; gap: 10px; }
+        input, button { padding: 8px; font-size: 16px; }
+        button { cursor: pointer; background-color: #28a745; color: white; border: none; }
+    </style>
+</head>
+<body>
+    <h2>Insira o Código Recebido</h2>
+    <p>Verifique sua caixa de entrada no e-mail.</p>
+
+    <form action="/verify-code" method="POST">
+        <!-- Campo oculto para repassar o e-mail para a rota POST -->
+        <input type="hidden" id="email" name="email">
+        
+        <label for="code">Código de 6 dígitos:</label>
+        <input type="text" id="code" name="code" required placeholder="Ex: 123456" maxlength="6">
+        
+        <button type="submit">Validar Acesso</button>
+    </form>
+    
+    <script>
+        // Puxa o e-mail da query string (ex: ?email=seuemail@gmail.com) e preenche o campo oculto
+        const urlParams = new URLSearchParams(window.location.search);
+        document.getElementById('email').value = urlParams.get('email');
+    </script>
+</body>
+</html>
