@@ -1,5 +1,6 @@
 package com.example.secrest.controller;
 
+import com.example.secrest.dto.RecoveryJwtTokenDto;
 import com.example.secrest.dto.RequestCodeDto;
 import com.example.secrest.dto.VerifyCodeDto;
 import com.example.secrest.service.AuthService;
@@ -18,29 +19,20 @@ public class AuthController {
     }
 
     @PostMapping("/request-code")
-    public ResponseEntity<String> requestCode(
-            @RequestBody RequestCodeDto dto) {
-
+    public ResponseEntity<String> requestCode(@RequestBody RequestCodeDto dto) {
         authService.requestCode(dto.getEmail());
-
-        return ResponseEntity.ok(
-                "Código enviado para o e-mail informado.");
+        return ResponseEntity.ok("Código enviado para o e-mail informado.");
     }
 
     @PostMapping("/verify-code")
-    public ResponseEntity<String> verifyCode(
-            @RequestBody VerifyCodeDto dto) {
+    public ResponseEntity<?> verifyCode(@RequestBody VerifyCodeDto dto) {
+        String token = authService.verifyCode(dto.getEmail(), dto.getCode());
 
-        boolean valido =
-                authService.verifyCode(
-                        dto.getEmail(),
-                        dto.getCodigo());
-
-        if (valido) {
-            return ResponseEntity.ok("Código válido");
+        if (token != null) {
+            // Retorna { "token": "eyJ..." } — o frontend lê response.data.token
+            return ResponseEntity.ok(new RecoveryJwtTokenDto(token));
         }
 
-        return ResponseEntity.badRequest()
-                .body("Código inválido ou expirado");
+        return ResponseEntity.status(401).body("Código inválido ou expirado");
     }
 }

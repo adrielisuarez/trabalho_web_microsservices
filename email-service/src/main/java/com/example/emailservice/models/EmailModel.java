@@ -1,15 +1,11 @@
 package com.example.emailservice.models;
-
 import jakarta.persistence.*;
 import lombok.Data;
 import java.time.LocalDateTime;
 import java.util.UUID;
-
-@Entity
-@Data
+@Entity @Table(name = "tb_emails") @Data
 public class EmailModel {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Id @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID emailId;
     private UUID userId;
     private String emailFrom;
@@ -18,12 +14,6 @@ public class EmailModel {
     @Column(columnDefinition = "TEXT")
     private String text;
     private LocalDateTime sendDateEmail;
-    
     @Enumerated(EnumType.STRING)
     private StatusEmail status;
-}
-
-
-public enum StatusEmail {
-    SENT, ERROR
 }

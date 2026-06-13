@@ -3,7 +3,7 @@ package com.example.secrest.dto;
 public class VerifyCodeDto {
 
     private String email;
-    private String codigo;
+    private String code; // era "codigo" — corrigido para bater com o JSON do frontend
 
     public String getEmail() {
         return email;
@@ -13,11 +13,11 @@ public class VerifyCodeDto {
         this.email = email;
     }
 
-    public String getCodigo() {
-        return codigo;
+    public String getCode() {
+        return code;
     }
 
-    public void setCodigo(String codigo) {
-        this.codigo = codigo;
+    public void setCode(String code) {
+        this.code = code;
     }
 }

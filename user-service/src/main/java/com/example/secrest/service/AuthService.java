@@ -6,6 +6,8 @@ import com.example.secrest.entity.User;
 import com.example.secrest.enums.RoleName;
 import com.example.secrest.producer.UserProducer;
 import com.example.secrest.repository.UserRepository;
+import com.example.secrest.security.service.JwtTokenService;
+import com.example.secrest.security.service.UserDetailsImpl;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -20,62 +22,67 @@ public class AuthService {
     private final CodigoCacheService codigoCacheService;
     private final UserProducer userProducer;
     private final PasswordEncoder passwordEncoder;
+    private final JwtTokenService jwtTokenService;
 
     public AuthService(
             UserRepository userRepository,
             CodigoCacheService codigoCacheService,
             UserProducer userProducer,
-            PasswordEncoder passwordEncoder) {
+            PasswordEncoder passwordEncoder,
+            JwtTokenService jwtTokenService) {
 
         this.userRepository = userRepository;
         this.codigoCacheService = codigoCacheService;
         this.userProducer = userProducer;
         this.passwordEncoder = passwordEncoder;
+        this.jwtTokenService = jwtTokenService;
     }
 
     public void requestCode(String email) {
-
-        User user = userRepository
-                .findByEmail(email)
+        // Busca usuário existente ou cria um temporário
+        userRepository.findByEmail(email)
                 .orElseGet(() -> criarUsuarioTemporario(email));
 
-        String codigo = String.format(
-                "%06d",
-                new Random().nextInt(999999)
-        );
+        // Gera código de 6 dígitos com zero à esquerda
+        String codigo = String.format("%06d", new Random().nextInt(999999));
 
         codigoCacheService.salvarCodigo(email, codigo);
 
         EmailDto emailDto = new EmailDto();
-
         emailDto.setEmailTo(email);
         emailDto.setSubject("Seu código de acesso");
-        emailDto.setText("Seu código é: " + codigo);
+        emailDto.setText("Seu código de verificação é: " + codigo
+                + "\n\nEle expira em 5 minutos.");
 
         userProducer.publishEmail(emailDto);
     }
 
-    public boolean verifyCode(
-            String email,
-            String codigo) {
+    /**
+     * Valida o código e, se correto, gera e retorna um token JWT.
+     * Retorna null se o código for inválido ou expirado.
+     */
+    public String verifyCode(String email, String codigo) {
+        boolean valido = codigoCacheService.validarCodigo(email, codigo);
 
-        return codigoCacheService
-                .validarCodigo(email, codigo);
+        if (!valido) {
+            return null;
+        }
+
+        // Remove o código após uso para evitar reutilização
+        codigoCacheService.removerCodigo(email);
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado: " + email));
+
+        UserDetailsImpl userDetails = new UserDetailsImpl(user);
+        return jwtTokenService.generateToken(userDetails);
     }
 
-    private User criarUsuarioTemporario(
-            String email) {
-
+    private User criarUsuarioTemporario(String email) {
         User user = User.builder()
                 .email(email)
-                .password(
-                        passwordEncoder.encode(
-                                "TEMP_" + System.currentTimeMillis()))
-                .roles(
-                        List.of(
-                                Role.builder()
-                                        .name(RoleName.ROLE_CUSTOMER)
-                                        .build()))
+                .password(passwordEncoder.encode("TEMP_" + System.currentTimeMillis()))
+                .roles(List.of(Role.builder().name(RoleName.ROLE_CUSTOMER).build()))
                 .build();
 
         return userRepository.save(user);
