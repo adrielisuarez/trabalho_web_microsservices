@@ -1,0 +1,20 @@
+{
+  "name": "frontend-auth",
+  "version": "1.0.0",
+  "description": "Frontend Node.js para solicitação e validação de e-mail com código",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "keywords": ["auth", "email", "verification"],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2",
+    "axios": "^1.6.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}

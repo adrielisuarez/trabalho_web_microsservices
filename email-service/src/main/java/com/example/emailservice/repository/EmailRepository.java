@@ -1,4 +1,4 @@
-package com.example.emailservice.repositories;
+package com.example.emailservice.repository;
 import com.example.emailservice.models.EmailModel;
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.UUID;

@@ -1,9 +1,18 @@
 package com.example.emailservice.models;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 import java.util.UUID;
-@Entity @Table(name = "tb_emails") @Data
+
+@Entity
+@Table(name = "tb_emails")
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class EmailModel {
     @Id @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID emailId;

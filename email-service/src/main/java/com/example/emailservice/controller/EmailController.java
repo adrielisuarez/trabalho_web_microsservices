@@ -1,31 +1,32 @@
 package com.example.emailservice.controller;
 
-import com.example.emailservice.dto.EmailRequestDto;
-import com.example.emailservice.dto.EmailResponseDto;
-import com.example.emailservice.service.EmailService;
+import com.example.emailservice.models.EmailModel;
+import com.example.emailservice.repository.EmailRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import java.util.Optional;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/emails")
 public class EmailController {
 
-    private final EmailService emailService;
+    private final EmailRepository emailRepository;
 
-    public EmailController(EmailService emailService) {
-        this.emailService = emailService;
+    public EmailController(EmailRepository emailRepository) {
+        this.emailRepository = emailRepository;
     }
 
-    @PostMapping
-    public ResponseEntity<EmailResponseDto> sendEmail(@RequestBody EmailRequestDto request) {
-        var emailMessage = emailService.sendEmail(request);
-        EmailResponseDto response = new EmailResponseDto(emailMessage.getId(), emailMessage.getStatus().name());
-        return ResponseEntity.ok(response);
+    @GetMapping("/{emailId}")
+    public ResponseEntity<?> getEmailStatus(@PathVariable UUID emailId) {
+        Optional<EmailModel> email = emailRepository.findById(emailId);
+        return email.isPresent() 
+            ? ResponseEntity.ok(email.get()) 
+            : ResponseEntity.notFound().build();
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<EmailResponseDto> getStatus(@PathVariable Long id) {
-        var status = emailService.getEmailStatus(id);
-        return ResponseEntity.ok(new EmailResponseDto(id, status.name()));
+    @GetMapping
+    public ResponseEntity<?> getAllEmails() {
+        return ResponseEntity.ok(emailRepository.findAll());
     }
 }

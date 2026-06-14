@@ -1,8 +1,8 @@
-package com.example.emailservice.services;
-import com.example.emailservice.dtos.EmailRecordDto;
+package com.example.emailservice.service;
+import com.example.emailservice.dto.EmailRecordDto;
 import com.example.emailservice.models.EmailModel;
 import com.example.emailservice.models.StatusEmail;
-import com.example.emailservice.repositories.EmailRepository;
+import com.example.emailservice.repository.EmailRepository;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;

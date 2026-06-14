@@ -1,6 +1,6 @@
 package com.example.emailservice.consumer;
-import com.example.emailservice.dtos.EmailRecordDto;
-import com.example.emailservice.services.EmailService;
+import com.example.emailservice.dto.EmailRecordDto;
+import com.example.emailservice.service.EmailService;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
 @Component
