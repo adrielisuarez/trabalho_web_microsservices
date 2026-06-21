@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; background: #f5f5f5; }
+        .container { max-width: 720px; background: white; padding: 24px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        h2 { margin-top: 0; color: #333; }
+        button { padding: 10px; margin-right: 8px; font-size: 15px; cursor: pointer; }
+        pre { background:#f0f0f0; padding:12px; border-radius:6px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Dashboard</h2>
+        <div>
+            <button id="testBtn">Testar endpoint protegido</button>
+            <button id="profileBtn">Meu perfil</button>
+            <button id="logoutBtn">Sair</button>
+        </div>
+
+        <h3>Resultado</h3>
+        <pre id="result">Nenhuma ação ainda.</pre>
+    </div>
+
+    <script>
+        const resultEl = document.getElementById('result');
+
+        document.getElementById('testBtn').addEventListener('click', async () => {
+            const token = sessionStorage.getItem('token');
+            if (!token) { window.location.href = '/'; return; }
+            try {
+                const r = await fetch('/api/protected', { headers: { 'Authorization': 'Bearer ' + token } });
+                const text = await r.text();
+                resultEl.textContent = `Status: ${r.status}\n\n${text}`;
+            } catch (err) {
+                resultEl.textContent = 'Erro: ' + err.message;
+            }
+        });
+
+        document.getElementById('profileBtn').addEventListener('click', async () => {
+            const token = sessionStorage.getItem('token');
+            if (!token) { window.location.href = '/'; return; }
+            try {
+                const r = await fetch('/api/me', { headers: { 'Authorization': 'Bearer ' + token } });
+                const json = await r.json();
+                resultEl.textContent = JSON.stringify(json, null, 2);
+            } catch (err) {
+                resultEl.textContent = 'Erro: ' + err.message;
+            }
+        });
+
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            sessionStorage.removeItem('token');
+            window.location.href = '/';
+        });
+    </script>
+</body>
+</html>

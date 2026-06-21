@@ -3,6 +3,7 @@ package com.example.secrest.service;
 import com.example.secrest.dto.CreateUserDto;
 import com.example.secrest.dto.LoginUserDto;
 import com.example.secrest.dto.RecoveryJwtTokenDto;
+import com.example.secrest.dto.UpdateProfileDto;
 import com.example.secrest.entity.Role;
 import com.example.secrest.entity.User;
 import com.example.secrest.repository.UserRepository;
@@ -47,5 +48,18 @@ public class UserService {
             .roles(List.of(Role.builder().name(createDto.role()).build()))
             .build();
         userRepository.save(newUser);
+    }
+
+    public User updateProfile(String email, UpdateProfileDto dto) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+        user.setName(dto.name());
+        user.setRoles(List.of(Role.builder().name(dto.role()).build()));
+        return userRepository.save(user);
+    }
+
+    public User getByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
     }
 }

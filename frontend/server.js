@@ -41,14 +41,14 @@ app.post('/verify-code', async (req, res) => {
         const response = await axios.post('http://localhost:8081/auth/verify-code', { email, code });
         const token = response.data.token;
 
-        // Injeta o token no sessionStorage do cliente e redireciona para o dashboard
+        // Injeta o token no sessionStorage do cliente e redireciona para a página de registro
         res.send(`
             <!DOCTYPE html>
             <html>
             <body>
                 <script>
                     sessionStorage.setItem('token', '${token}');
-                    window.location.href = '/dashboard';
+                    window.location.href = '/register';
                 </script>
             </body>
             </html>
@@ -61,19 +61,57 @@ app.post('/verify-code', async (req, res) => {
         `);
     }
 });
+// Serve página de registro
+app.get('/register', (req, res) => {
+    res.sendFile(path.join(__dirname, 'views', 'register.html'));
+});
 
-// GET /dashboard - Placeholder para a semana 4
+// POST /register - recebe name/role do cliente e encaminha para User Service
+app.post('/register', async (req, res) => {
+    const token = req.headers['authorization'];
+    const { name, role } = req.body;
+    if (!token) return res.status(401).send('Token ausente');
+    try {
+        const response = await axios.post('http://localhost:8081/users/update-profile', { name, role }, { headers: { Authorization: token } });
+        return res.status(response.status).send(response.data);
+    } catch (err) {
+        console.error('Erro ao atualizar perfil:', err.response ? err.response.data : err.message);
+        const status = err.response ? err.response.status : 500;
+        return res.status(status).send(err.response ? JSON.stringify(err.response.data) : err.message);
+    }
+});
+
+// GET /dashboard - serve a página do dashboard (cliente fará chamadas via JS)
 app.get('/dashboard', (req, res) => {
-    res.send(`
-        <!DOCTYPE html>
-        <html lang="pt-br">
-        <head><meta charset="UTF-8"><title>Dashboard</title></head>
-        <body>
-            <h2>Dashboard</h2>
-            <p>Autenticado com sucesso! (Semana 4)</p>
-        </body>
-        </html>
-    `);
+    res.sendFile(path.join(__dirname, 'views', 'dashboard.html'));
+});
+
+// Proxy para endpoint protegido (chama /users/test/customer)
+app.get('/api/protected', async (req, res) => {
+    const token = req.headers['authorization'];
+    if (!token) return res.status(401).send('Token ausente');
+    try {
+        const response = await axios.get('http://localhost:8081/users/test/customer', { headers: { Authorization: token } });
+        res.status(response.status).send(response.data);
+    } catch (err) {
+        console.error('Erro proxy /api/protected:', err.response ? err.response.data : err.message);
+        const status = err.response ? err.response.status : 500;
+        res.status(status).send(err.response ? JSON.stringify(err.response.data) : err.message);
+    }
+});
+
+// Proxy para /users/me
+app.get('/api/me', async (req, res) => {
+    const token = req.headers['authorization'];
+    if (!token) return res.status(401).send('Token ausente');
+    try {
+        const response = await axios.get('http://localhost:8081/users/me', { headers: { Authorization: token } });
+        res.status(response.status).send(response.data);
+    } catch (err) {
+        console.error('Erro proxy /api/me:', err.response ? err.response.data : err.message);
+        const status = err.response ? err.response.status : 500;
+        res.status(status).send(err.response ? JSON.stringify(err.response.data) : err.message);
+    }
 });
 
 app.listen(PORT, () => {

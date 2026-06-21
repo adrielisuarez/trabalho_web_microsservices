@@ -21,7 +21,6 @@ import java.io.IOException;
 
 @Component
 public class UserAuthenticationFilter extends OncePerRequestFilter {
-
     @Autowired
     private JwtTokenService jwtTokenService;
 
@@ -45,9 +44,8 @@ public class UserAuthenticationFilter extends OncePerRequestFilter {
 
         if (token != null) {
 
-            String email =
+                String email =
                     jwtTokenService.getSubjectFromToken(token);
-
             User user = userRepository
                     .findByEmail(email)
                     .orElseThrow(() ->
@@ -62,7 +60,7 @@ public class UserAuthenticationFilter extends OncePerRequestFilter {
                             null,
                             userDetails.getAuthorities());
 
-            SecurityContextHolder
+                SecurityContextHolder
                     .getContext()
                     .setAuthentication(authentication);
 

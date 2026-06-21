@@ -21,6 +21,7 @@ import java.util.List;
     private String email;
 
     private String password;
+    private String name;
     
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
     @JoinTable(
