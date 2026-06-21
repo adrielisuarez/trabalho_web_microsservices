@@ -5,6 +5,7 @@ import com.example.secrest.entity.Role;
 import com.example.secrest.entity.User;
 import com.example.secrest.enums.RoleName;
 import com.example.secrest.producer.UserProducer;
+import com.example.secrest.repository.RoleRepository;
 import com.example.secrest.repository.UserRepository;
 import com.example.secrest.security.service.JwtTokenService;
 import com.example.secrest.security.service.UserDetailsImpl;
@@ -19,6 +20,7 @@ import java.util.Random;
 public class AuthService {
 
     private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
     private final CodigoCacheService codigoCacheService;
     private final UserProducer userProducer;
     private final PasswordEncoder passwordEncoder;
@@ -26,12 +28,14 @@ public class AuthService {
 
     public AuthService(
             UserRepository userRepository,
+            RoleRepository roleRepository,
             CodigoCacheService codigoCacheService,
             UserProducer userProducer,
             PasswordEncoder passwordEncoder,
             JwtTokenService jwtTokenService) {
 
         this.userRepository = userRepository;
+        this.roleRepository = roleRepository;
         this.codigoCacheService = codigoCacheService;
         this.userProducer = userProducer;
         this.passwordEncoder = passwordEncoder;
@@ -79,10 +83,13 @@ public class AuthService {
     }
 
     private User criarUsuarioTemporario(String email) {
+        Role role = roleRepository.findByName(RoleName.ROLE_CUSTOMER)
+                .orElseGet(() -> roleRepository.save(Role.builder().name(RoleName.ROLE_CUSTOMER).build()));
+
         User user = User.builder()
                 .email(email)
                 .password(passwordEncoder.encode("TEMP_" + System.currentTimeMillis()))
-                .roles(List.of(Role.builder().name(RoleName.ROLE_CUSTOMER).build()))
+                .roles(new java.util.ArrayList<>(List.of(role)))
                 .build();
 
         return userRepository.save(user);

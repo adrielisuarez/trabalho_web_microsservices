@@ -142,18 +142,22 @@ npm install
 
 ### 2. Subir o User Service (porta 8081)
 
+O projeto é um build Maven multi-módulo: o `mvnw`/`mvnw.cmd` fica na **raiz**
+do repositório, não dentro de cada subpasta. Rode a partir da raiz,
+especificando o módulo com `-pl`:
+
 ```bash
-cd user-service
-./mvnw spring-boot:run        # Linux/Mac
-mvnw.cmd spring-boot:run      # Windows
+./mvnw spring-boot:run -pl user-service       # Linux/Mac
+mvnw.cmd spring-boot:run -pl user-service     # Windows
 ```
 
 ### 3. Subir o Email Service (porta 8082)
 
+Em outro terminal, também a partir da raiz:
+
 ```bash
-cd email-service
-./mvnw spring-boot:run        # Linux/Mac
-mvnw.cmd spring-boot:run      # Windows
+./mvnw spring-boot:run -pl email-service      # Linux/Mac
+mvnw.cmd spring-boot:run -pl email-service    # Windows
 ```
 
 ### 4. Subir o Frontend (porta 3000)

@@ -13,14 +13,14 @@ Write-Host "Iniciando User Service (porta 8081)..." -ForegroundColor Cyan
 Start-Process powershell -ArgumentList @(
     "-NoExit",
     "-Command",
-    "cd '$root\user-service'; .\mvnw.cmd spring-boot:run"
+    "cd '$root'; .\mvnw.cmd spring-boot:run -pl user-service"
 )
 
 Write-Host "Iniciando Email Service (porta 8082)..." -ForegroundColor Cyan
 Start-Process powershell -ArgumentList @(
     "-NoExit",
     "-Command",
-    "cd '$root\email-service'; .\mvnw.cmd spring-boot:run"
+    "cd '$root'; .\mvnw.cmd spring-boot:run -pl email-service"
 )
 
 Write-Host "Aguardando os servicos Java subirem antes de iniciar o frontend..." -ForegroundColor Yellow

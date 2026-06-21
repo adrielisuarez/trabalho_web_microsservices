@@ -6,6 +6,7 @@ import com.example.secrest.dto.RecoveryJwtTokenDto;
 import com.example.secrest.dto.UpdateProfileDto;
 import com.example.secrest.entity.Role;
 import com.example.secrest.entity.User;
+import com.example.secrest.repository.RoleRepository;
 import com.example.secrest.repository.UserRepository;
 import com.example.secrest.security.service.JwtTokenService;
 import com.example.secrest.security.service.UserDetailsImpl;
@@ -16,6 +17,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service 
@@ -29,6 +31,9 @@ public class UserService {
     
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private RoleRepository roleRepository;
     
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -42,10 +47,11 @@ public class UserService {
     }
     
     public void createUser(CreateUserDto createDto) {
+        Role role = getOrCreateRole(createDto.role());
         User newUser = User.builder()
             .email(createDto.email())
             .password(passwordEncoder.encode(createDto.password()))
-            .roles(List.of(Role.builder().name(createDto.role()).build()))
+            .roles(new ArrayList<>(List.of(role)))
             .build();
         userRepository.save(newUser);
     }
@@ -53,9 +59,19 @@ public class UserService {
     public User updateProfile(String email, UpdateProfileDto dto) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+        Role role = getOrCreateRole(dto.role());
         user.setName(dto.name());
-        user.setRoles(List.of(Role.builder().name(dto.role()).build()));
+        user.setRoles(new ArrayList<>(List.of(role)));
         return userRepository.save(user);
+    }
+
+    /**
+     * Busca uma Role existente pelo nome ou cria uma nova caso não exista.
+     * Evita criar registros duplicados de Role na tabela "roles".
+     */
+    private Role getOrCreateRole(com.example.secrest.enums.RoleName roleName) {
+        return roleRepository.findByName(roleName)
+                .orElseGet(() -> roleRepository.save(Role.builder().name(roleName).build()));
     }
 
     public User getByEmail(String email) {
