@@ -54,6 +54,7 @@ public class SecurityConfiguration {
                                 .requestMatchers(HttpMethod.POST, "/users/login").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/auth/request-code").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/auth/verify-code").permitAll()
+                                .requestMatchers("/error").permitAll()
                                 .anyRequest().authenticated())
                 .addFilterBefore(
                         userAuthenticationFilter,

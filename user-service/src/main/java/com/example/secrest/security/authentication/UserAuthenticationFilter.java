@@ -34,6 +34,11 @@ public class UserAuthenticationFilter extends OncePerRequestFilter {
             FilterChain filterChain)
             throws ServletException, IOException {
 
+        String uri = request.getRequestURI();
+        String method = request.getMethod();
+        String authHeader = request.getHeader("Authorization");
+        System.out.println("[AUTH FILTER] " + method + " " + uri + " Authorization=" + authHeader);
+
         // ENDPOINTS PÚBLICOS
         if (isPublicEndpoint(request)) {
             filterChain.doFilter(request, response);
@@ -43,9 +48,9 @@ public class UserAuthenticationFilter extends OncePerRequestFilter {
         String token = recoverToken(request);
 
         if (token != null) {
-
-                String email =
-                    jwtTokenService.getSubjectFromToken(token);
+            System.out.println("[AUTH FILTER] token extracted=" + token);
+            String email = jwtTokenService.getSubjectFromToken(token);
+            System.out.println("[AUTH FILTER] email from token=" + email);
             User user = userRepository
                     .findByEmail(email)
                     .orElseThrow(() ->
@@ -60,12 +65,13 @@ public class UserAuthenticationFilter extends OncePerRequestFilter {
                             null,
                             userDetails.getAuthorities());
 
-                SecurityContextHolder
+            System.out.println("[AUTH FILTER] authentication set: " + authentication.isAuthenticated() + " authorities=" + authentication.getAuthorities());
+            SecurityContextHolder
                     .getContext()
                     .setAuthentication(authentication);
 
         } else {
-
+            System.out.println("[AUTH FILTER] no token found; rejecting request");
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return;
         }
